@@ -21,10 +21,8 @@ namespace AsyncAwait.Task2.CodeReviewChallenge.Models.Support
             try
             {
                 await _supportService.RegisterSupportRequestAsync(requestInfo);
-                //Console.WriteLine(t.Status); // this is for debugging purposes
-                //Thread.Sleep(5000); // this is just to be sure that the request is registered
+
                 return await _supportService.GetSupportInfoAsync(requestInfo);
-                    //.ConfigureAwait(false);
             }
             catch (HttpRequestException ex)
             {

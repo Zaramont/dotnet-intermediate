@@ -16,6 +16,9 @@ namespace AsyncAwait.Task1.CancellationTokens
 
     internal class Program
     {
+        private static CancellationTokenSource cts = new CancellationTokenSource();
+        private static readonly AutoResetEvent waitHandle = new AutoResetEvent(true);
+
         /// <summary>
         /// The Main method should not be changed at all.
         /// </summary>
@@ -32,34 +35,35 @@ namespace AsyncAwait.Task1.CancellationTokens
             var input = Console.ReadLine();
             while (input.Trim().ToUpper() != "Q")
             {
-                using (var cts = new CancellationTokenSource())
-                {
-                    if (int.TryParse(input, out var n))
-                    {
-                        CalculateSum(n, cts.Token);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Invalid integer: '{input}'. Please try again.");
-                        Console.WriteLine("Enter N: ");
-                    }
 
-                    input = Console.ReadLine();
-                    cts.Cancel();
+                if (int.TryParse(input, out var n))
+                {
+                    CalculateSum(n);
                 }
+                else
+                {
+                    Console.WriteLine($"Invalid integer: '{input}'. Please try again.");
+                    Console.WriteLine("Enter N: ");
+                }
+
+                input = Console.ReadLine();
             }
 
             Console.WriteLine("Press any key to continue");
             Console.ReadLine();
         }
 
-        private static async void CalculateSum(int n, CancellationToken token)
+        private static async void CalculateSum(int n)
         {
+            var previousTokenSource = cts;
             try
             {
-                Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
+                previousTokenSource?.Cancel();
+                cts = new CancellationTokenSource();
 
-                var sum = await Task.Run(() => Calculator.Calculate(n, token), token);
+                waitHandle.WaitOne();
+                Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
+                var sum = await Task.Run(() => Calculator.Calculate(n, cts.Token), cts.Token);
 
                 Console.WriteLine($"Sum for {n} = {sum}.");
                 Console.WriteLine();
@@ -68,7 +72,12 @@ namespace AsyncAwait.Task1.CancellationTokens
             catch (OperationCanceledException)
             {
                 Console.WriteLine($"Sum for {n} cancelled...");
-            }            
+            }
+            finally
+            {
+                waitHandle.Set();
+                previousTokenSource?.Dispose();
+            }
         }
     }
 }

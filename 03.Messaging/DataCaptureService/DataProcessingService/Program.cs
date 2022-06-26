@@ -5,7 +5,7 @@ namespace DataProcessingService
 {
     class Program
     {
-        private static string directoryWithProcessedFiles = @"C:\.Net\03.Messaging\DataCaptureService\DataProcessingService\ProcessedFiles\";
+        private static string directoryWithProcessedFiles = @".\\ProcessedFiles";
         private static string connectionString = @"Endpoint=sb://files-queue.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=60Lp4ii2nTiADl9a1JM68MZ8mD7DGpu232CxGqmYw+c=";
         private static string queueName = "capturedFiles";
 

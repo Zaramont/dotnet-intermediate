@@ -34,8 +34,21 @@ namespace DataCaptureService
         {
             try
             {
-                var fi = new FileInfo(e.FullPath);
-                while (IsFileLocked(fi)) { Thread.Sleep(200); };
+                var fileInfo = new FileInfo(e.FullPath);
+                while (true) 
+                {
+                    if (!fileInfo.Exists)
+                    {
+                        return;
+                    }
+                    else if (!IsFileLocked(fileInfo))
+                    {
+                        break;
+                    }    
+                    
+                    Thread.Sleep(200);
+                };
+
                 await dataSender.SendFileToQueue(e.FullPath);
                 File.Delete(e.FullPath);
             }

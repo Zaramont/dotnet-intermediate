@@ -8,12 +8,17 @@
 */
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AsyncAwait.Task1.CancellationTokens
 {
 
     internal class Program
     {
+        private static CancellationTokenSource cts = new CancellationTokenSource();
+        private static readonly AutoResetEvent waitHandle = new AutoResetEvent(true);
+
         /// <summary>
         /// The Main method should not be changed at all.
         /// </summary>
@@ -30,6 +35,7 @@ namespace AsyncAwait.Task1.CancellationTokens
             var input = Console.ReadLine();
             while (input.Trim().ToUpper() != "Q")
             {
+
                 if (int.TryParse(input, out var n))
                 {
                     CalculateSum(n);
@@ -47,17 +53,31 @@ namespace AsyncAwait.Task1.CancellationTokens
             Console.ReadLine();
         }
 
-        private static void CalculateSum(int n)
+        private static async void CalculateSum(int n)
         {
-            // todo: make calculation asynchronous
-            var sum = Calculator.Calculate(n);
-            Console.WriteLine($"Sum for {n} = {sum}.");
-            Console.WriteLine();
-            Console.WriteLine("Enter N: ");
-            // todo: add code to process cancellation and uncomment this line    
-            // Console.WriteLine($"Sum for {n} cancelled...");
+            var previousTokenSource = cts;
+            try
+            {
+                previousTokenSource?.Cancel();
+                cts = new CancellationTokenSource();
 
-            Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
+                waitHandle.WaitOne();
+                Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
+                var sum = await Task.Run(() => Calculator.Calculate(n, cts.Token), cts.Token);
+
+                Console.WriteLine($"Sum for {n} = {sum}.");
+                Console.WriteLine();
+                Console.WriteLine("Enter N: ");
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine($"Sum for {n} cancelled...");
+            }
+            finally
+            {
+                waitHandle.Set();
+                previousTokenSource?.Dispose();
+            }
         }
     }
 }

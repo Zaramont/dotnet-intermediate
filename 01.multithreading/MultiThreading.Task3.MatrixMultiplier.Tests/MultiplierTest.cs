@@ -1,7 +1,9 @@
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MultiThreading.Task3.MatrixMultiplier.Matrices;
 using MultiThreading.Task3.MatrixMultiplier.Multipliers;
+using System;
+using System.Diagnostics;
+using System.Linq;
 
 namespace MultiThreading.Task3.MatrixMultiplier.Tests
 {
@@ -18,8 +20,38 @@ namespace MultiThreading.Task3.MatrixMultiplier.Tests
         [TestMethod]
         public void ParallelEfficiencyTest()
         {
-            // todo: implement a test method to check the size of the matrix which makes parallel multiplication more effective than
-            // todo: the regular one
+            var sw = new Stopwatch();
+            var sw2 = new Stopwatch();
+
+            for (long sizeOfMatrix = 1; sizeOfMatrix < 100; sizeOfMatrix++)
+            {
+                MeasureExecutionTime(sizeOfMatrix);
+                long sequentialResult = sw.ElapsedMilliseconds;
+                long parallelResult = sw2.ElapsedMilliseconds;
+
+                if (parallelResult < sequentialResult)
+                {
+                    Assert.IsFalse(parallelResult < sequentialResult, $"Parallel methos is effective when size of the matrix is equal or greater than: {sizeOfMatrix}.");
+                }
+
+                sw.Reset();
+                sw2.Reset();
+            }
+
+            void MeasureExecutionTime(long sizeOfMatrix)
+            {
+                var firstMatrix = new Matrix(sizeOfMatrix, sizeOfMatrix, true);
+                var secondMatrix = new Matrix(sizeOfMatrix, sizeOfMatrix, true);
+
+                sw.Start();
+                IMatrix resultMatrix = new MatricesMultiplier().Multiply(firstMatrix, secondMatrix);
+                sw.Stop();
+
+                sw2.Start();
+                IMatrix resultMatrixUsingParallel = new MatricesMultiplierParallel().Multiply(firstMatrix, secondMatrix);
+                sw2.Stop();
+            }
+
         }
 
         #region private methods

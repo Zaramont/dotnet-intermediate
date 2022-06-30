@@ -13,14 +13,12 @@ namespace ProfileSample.Controllers
         {
             var context = new ProfileSampleEntities();
 
-            var sources = context.ImgSources.Take(20).Select(x => x.Id);
+            var sources = context.ImgSources.Take(20).Select(x => new { x.Name, x.Data });
 
             var model = new List<ImageModel>();
 
-            foreach (var id in sources)
+            foreach (var item in sources)
             {
-                var item = context.ImgSources.Find(id);
-
                 var obj = new ImageModel()
                 {
                     Name = item.Name,

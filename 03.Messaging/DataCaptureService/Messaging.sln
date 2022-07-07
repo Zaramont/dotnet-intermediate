@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32428.217
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataCaptureService", "DataCaptureService\DataCaptureService.csproj", "{B8DA5635-963A-4180-A376-8FF8348A138B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataProcessingService", "DataProcessingService\DataProcessingService.csproj", "{77EC7E11-02A7-47CE-8F30-9AF1E136C4B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8DA5635-963A-4180-A376-8FF8348A138B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8DA5635-963A-4180-A376-8FF8348A138B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8DA5635-963A-4180-A376-8FF8348A138B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8DA5635-963A-4180-A376-8FF8348A138B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77EC7E11-02A7-47CE-8F30-9AF1E136C4B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77EC7E11-02A7-47CE-8F30-9AF1E136C4B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77EC7E11-02A7-47CE-8F30-9AF1E136C4B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77EC7E11-02A7-47CE-8F30-9AF1E136C4B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {834C6A1C-9579-45F9-A087-7D4DCD610BE0}
+	EndGlobalSection
+EndGlobal

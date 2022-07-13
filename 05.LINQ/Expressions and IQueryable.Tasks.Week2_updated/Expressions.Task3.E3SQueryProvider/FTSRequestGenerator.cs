@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Expressions.Task3.E3SQueryProvider
 {
     public class FtsRequestGenerator
     {
+        readonly string queriesDelimiter = " AndAlso ";
         private readonly string _FTSSearchTemplate = @"/searchFts";
         private readonly string _baseAddress;
 
@@ -32,14 +34,11 @@ namespace Expressions.Task3.E3SQueryProvider
         {
             string metaTypeName = GetMetaTypeName(type);
 
+            var statements = query.Split(queriesDelimiter).Select(x => new Statement { Query = x }).ToList();
+
             var ftsQueryRequest = new FtsQueryRequest
             {
-                Statements = new List<Statement>
-                {
-                    new Statement {
-                        Query = query
-                    }
-                },
+                Statements = statements,
                 Start = start,
                 Limit = limit
             };

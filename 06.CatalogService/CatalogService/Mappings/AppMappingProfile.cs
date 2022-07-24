@@ -15,9 +15,10 @@ namespace CatalogService.Api.Web.Utilities
             CreateMap<ItemDetail, Item>().ReverseMap();
             CreateMap<ItemForCreate, Item>().ReverseMap();
             CreateMap<ItemForUpdate, Item>().ReverseMap();
-            CreateMap<PagedList<Category>, PagedList<CategoryDetail>>().ConvertUsing(new PagedListConverter());
+            CreateMap<PagedList<Category>, PagedList<CategoryDetail>>().ConvertUsing(new PagedListCategoryConverter());
         }
-        public class PagedListConverter : ITypeConverter<PagedList<Category>, PagedList<CategoryDetail>>
+
+        public class PagedListCategoryConverter : ITypeConverter<PagedList<Category>, PagedList<CategoryDetail>>
         {
             public PagedList<CategoryDetail> Convert(PagedList<Category> source, PagedList<CategoryDetail>  destination, ResolutionContext context)
             {

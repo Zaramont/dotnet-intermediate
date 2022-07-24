@@ -3,7 +3,6 @@ using CatalogService.Data;
 using CatalogService.Models.App;
 using CatalogService.Models.EF;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace CatalogService.Services
 {

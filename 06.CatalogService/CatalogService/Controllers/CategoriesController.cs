@@ -60,7 +60,7 @@ namespace CatalogService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(CategoryForCreate category)
+        public async Task<ActionResult<CategoryDetail>> PostCategory(CategoryForCreate category)
         {
             var createdCategory = await _categoryService.CreateCategory(category);
 

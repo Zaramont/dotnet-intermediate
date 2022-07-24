@@ -2,6 +2,7 @@
 using CatalogService.Data;
 using CatalogService.Models.App;
 using CatalogService.Models.EF;
+using CatalogService.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,116 +13,54 @@ namespace CatalogService.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly CategoryDbContext _context;
+        private readonly ItemService _itemService;
 
-        public ItemsController(IMapper mapper, CategoryDbContext context)
+        public ItemsController(IMapper mapper, ItemService context)
         {
             _mapper = mapper;
-            _context = context;
+            _itemService = context;
         }
 
-        // GET: api/Items
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Item>>> GetItems()
+        public async Task<ActionResult<IEnumerable<Item>>> GetItems([FromQuery] ItemQuery query)
         {
-            if (_context.Items == null)
-            {
-                return NotFound();
-            }
-            var items =  await _context.Items.ToListAsync();
-            var itemsMapped = _mapper.Map<IList<Item>>(items);
-
-            return Ok(itemsMapped);
+            var items = await _itemService.GetItems(query);
+            return Ok(items);
         }
 
-        // GET: api/Items/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Item>> GetItem(long id)
         {
-            if (_context.Items == null)
-            {
-                return NotFound();
-            }
-            var item = await _context.Items.FindAsync(id);
+            var item = await _itemService.GetItem(id);
 
             if (item == null)
             {
                 return NotFound();
             }
 
-            return item;
+            return Ok(item);
         }
 
-        // PUT: api/Items/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutItem(long id, Item item)
+        public async Task<IActionResult> PutItem(long id, ItemForUpdate item)
         {
-            if (id != item.ItemId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(item).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            await _itemService.UpdateItem(id, item);
             return NoContent();
         }
 
-        // POST: api/Items
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Item>> PostItem(ItemForCreate itemForUpdate)
+        public async Task<ActionResult<ItemDetail>> PostItem(ItemForCreate itemForCreate)
         {
-            if (_context.Items == null)
-            {
-                return Problem("Entity set 'CategoryDbContext.Item'  is null.");
-            }
-            var item = _mapper.Map<Item>(itemForUpdate);
-            _context.Items.Add(item);
-            await _context.SaveChangesAsync();
+            var createdItem = await _itemService.CreateItem(itemForCreate);
 
-            return CreatedAtAction("PostItem", new { id = item.ItemId }, item);
+            return CreatedAtAction("PostItem", new { id = createdItem.ItemId }, createdItem);
         }
 
-        // DELETE: api/Items/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItem(long id)
         {
-            if (_context.Items == null)
-            {
-                return NotFound();
-            }
-            var item = await _context.Items.FindAsync(id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            _context.Items.Remove(item);
-            await _context.SaveChangesAsync();
-
+            await _itemService.DeleteItem(id);
             return NoContent();
-        }
-
-        private bool ItemExists(long id)
-        {
-            return (_context.Items?.Any(e => e.ItemId == id)).GetValueOrDefault();
         }
     }
 }

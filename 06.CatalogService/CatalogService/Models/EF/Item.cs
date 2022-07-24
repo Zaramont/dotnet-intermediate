@@ -10,6 +10,6 @@ namespace CatalogService.Models.EF
         public double Price { get; set; }
 
         public long CategoryId { get; set; }
-        //public Category? Category { get; set; }
+        public Category? Category { get; set; }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using CatalogService.Data;
 using CatalogService.Models.App;
 using CatalogService.Models.EF;
 using CatalogService.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CatalogService.Controllers
 {
@@ -22,7 +20,7 @@ namespace CatalogService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Item>>> GetItems([FromQuery] ItemQuery query)
+        public async Task<ActionResult<IEnumerable<ItemDetail>>> GetItems([FromQuery] ItemQuery query)
         {
             var items = await _itemService.GetItems(query);
             return Ok(items);

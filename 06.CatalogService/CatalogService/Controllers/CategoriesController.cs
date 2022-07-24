@@ -24,7 +24,7 @@ namespace CatalogService.Controllers
         
         
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories(CategoryQuery query)
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategories([FromQuery]CategoryQuery query)
         {
             var categories = await _categoryService.GetCategories(query);
             return Ok(categories);
@@ -71,23 +71,6 @@ namespace CatalogService.Controllers
         public async Task<IActionResult> DeleteCategory(long id)
         {
             await _categoryService.DeleteCategory(id);
-            return NoContent();
-        }
-
-        [HttpPatch("{categoryId:long}", Name = nameof(PathCategory))]
-        public async Task<IActionResult> PathCategory([FromRoute] long categoryId, [FromBody] JsonPatchDocument<CategoryForPatch> patch)
-        {
-            var categoryForPatch = await _categoryService.GetCategoryForPatch(categoryId);
-
-            if (categoryForPatch == null)
-                return NotFound();
-
-            patch.ApplyTo(categoryForPatch);
-
-            if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
-
-            await _categoryService.PatchCategory(categoryId, categoryForPatch);
             return NoContent();
         }
     }

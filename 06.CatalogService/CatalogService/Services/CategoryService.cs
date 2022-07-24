@@ -3,6 +3,7 @@ using CatalogService.Data;
 using CatalogService.Models.App;
 using CatalogService.Models.EF;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace CatalogService.Services
 {
@@ -41,7 +42,7 @@ namespace CatalogService.Services
                 .Categories
                 .FirstOrDefaultAsync(category => category.CategoryId == categoryId);
 
-            if (categoryFromDb == null) 
+            if (categoryFromDb == null)
                 throw new EntityNotFoundException($"A category having id '{categoryId}' could not be found");
 
             _context.Categories.Remove(categoryFromDb);
@@ -76,33 +77,11 @@ namespace CatalogService.Services
 
             async Task<ICollection<CategoryDetail>> GetCategories()
             {
-                var categoriesFromDb = await _context.Categories.ToListAsync();
-                var mappedCategories = _mapper.Map<IList<CategoryDetail>>(categoriesFromDb);
+                var categoriesFromDb = await PagedList<Category>.ToPagedListAsync(_context.Categories, query.PageNumber, query.PageSize);
+
+                var mappedCategories = _mapper.Map<PagedList<CategoryDetail>>(categoriesFromDb);
 
                 return mappedCategories;
-            }
-        }
-
-        public Task PatchCategory(long categoryId, CategoryForPatch categoryForPatch)
-        {
-            if (categoryForPatch is null)
-                throw new ArgumentNullException(nameof(categoryForPatch));
-
-            return PatchCategory();
-
-            async Task PatchCategory()
-            {
-                var categoryFromDb = await _context
-                    .Categories
-                    .FirstOrDefaultAsync(category => category.CategoryId == categoryId);
-
-                if (categoryFromDb == null)
-                    throw new EntityNotFoundException($"A category having id '{categoryId}' could not be found");
-
-                categoryFromDb.Name = categoryForPatch.Name;
-                categoryFromDb.Description = categoryForPatch.Description;
-
-                await _context.SaveChangesAsync().ConfigureAwait(false);
             }
         }
 
@@ -117,8 +96,7 @@ namespace CatalogService.Services
             {
                 var categoryFromDb = await _context
                     .Categories
-                    .FirstOrDefaultAsync(category => category.CategoryId == categoryId)
-                    .ConfigureAwait(false);
+                    .FirstOrDefaultAsync(category => category.CategoryId == categoryId);
 
                 if (categoryFromDb == null)
                     throw new EntityNotFoundException($"A category having id '{categoryId}' could not be found");

@@ -1,6 +1,5 @@
 using CatalogService.Api.Web.Utilities;
-using CatalogService.Controllers;
-
+using CatalogService.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

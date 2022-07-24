@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
-using CatalogService.Models;
+using CatalogService.Data;
+using CatalogService.Models.App;
+using CatalogService.Models.EF;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -84,17 +86,17 @@ namespace CatalogService.Controllers
         // POST: api/Items
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Item>> PostItem(ItemUpdate item)
+        public async Task<ActionResult<Item>> PostItem(ItemForCreate itemForUpdate)
         {
             if (_context.Items == null)
             {
                 return Problem("Entity set 'CategoryDbContext.Item'  is null.");
             }
-            var itemBs = _mapper.Map<Item>(item);
-            _context.Items.Add(itemBs);
+            var item = _mapper.Map<Item>(itemForUpdate);
+            _context.Items.Add(item);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetItem", new { id = item.ItemId }, item);
+            return CreatedAtAction("PostItem", new { id = item.ItemId }, item);
         }
 
         // DELETE: api/Items/5

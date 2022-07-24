@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using CatalogService.Api.Web.Models;
-using CatalogService.Models;
+using CatalogService.Models.App;
+using CatalogService.Models.EF;
 
 namespace CatalogService.Api.Web.Utilities
 {
@@ -8,11 +8,12 @@ namespace CatalogService.Api.Web.Utilities
     {
         public AppMappingProfile()
         {
-            CreateMap<CategoryUpdate, Category>().ReverseMap();
-            CreateMap<ItemUpdate, Item>().ReverseMap();
-            CreateMap<Category, Category>()
-                .ForMember(dst => dst.Items, opt => opt.MapFrom(src => src.Items))
-                .ReverseMap();
+            CreateMap<CategoryDetail, Category>().ReverseMap();
+            CreateMap<CategoryForCreate, Category>().ReverseMap();
+            CreateMap<CategoryForUpdate, Category>().ReverseMap();
+            CreateMap<ItemDetail, Item>().ReverseMap();
+            CreateMap<ItemForCreate, Item>().ReverseMap();
+            CreateMap<ItemForUpdate, Item>().ReverseMap();
         }
     }
 }

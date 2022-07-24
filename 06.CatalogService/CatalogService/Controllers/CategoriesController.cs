@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
-using CatalogService.Api.Web.Models;
-using CatalogService.Models;
+using CatalogService.Data;
+using CatalogService.Models.App;
+using CatalogService.Models.EF;
+using CatalogService.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,115 +14,81 @@ namespace CatalogService.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly CategoryDbContext _context;
+        private readonly CategoryService _categoryService;
 
-        public CategoriesController(IMapper mapper, CategoryDbContext context)
+        public CategoriesController(CategoryService categoryService, IMapper mapper)
         {
-            _mapper = mapper;
-            _context = context;
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-
-        // GET: api/Categories
+        
+        
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategories(CategoryQuery query)
         {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            var categories = await _context.Categories.ToListAsync();
-            var mappedCategories = _mapper.Map<IList<Mappings.Category>>(categories);
+            var categories = await _categoryService.GetCategories(query);
             return Ok(categories);
         }
 
-        // GET: api/Categories/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Category>> GetCategory(long id)
         {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _categoryService.GetCategory(id);
 
             if (category == null)
             {
                 return NotFound();
             }
 
-            return category;
+            return Ok(category);
         }
-
-        // PUT: api/Categories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(long id, Category category)
+        
+        
+        /*[HttpGet("{categoryId:long}/items", Name = nameof(GetCategoryItemsList))]
+        public async Task<IActionResult> GetCategoryItemsList([FromRoute] long categoryId)
         {
-            if (id != category.CategoryId)
-            {
-                return BadRequest();
-            }
+            var itemsFromDb = await _context.Items.Where(x => x.CategoryId == categoryId).ToListAsync();
+            
+            return Ok(itemsFromDb);
+        }*/
 
-            _context.Entry(category).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CategoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutCategory(long id, CategoryForUpdate category)
+        {
+            await _categoryService.UpdateCategory(id, category);
             return NoContent();
         }
 
-        // POST: api/Categories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(CategoryUpdate category)
+        public async Task<ActionResult<Category>> PostCategory(CategoryForCreate category)
         {
-            if (_context.Categories == null)
-            {
-                return Problem("Entity set 'CategoryDbContext.Categories'  is null.");
-            }
-            var categoryBs = _mapper.Map<Category>(category);
-            _context.Categories.Add(categoryBs);
-            await _context.SaveChangesAsync();
+            var createdCategory = await _categoryService.CreateCategory(category);
 
-            return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
+            return CreatedAtAction("PostCategory", new { id = createdCategory.CategoryId }, category);
         }
 
-        // DELETE: api/Categories/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(long id)
         {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
+            await _categoryService.DeleteCategory(id);
             return NoContent();
         }
 
-        private bool CategoryExists(long id)
+        [HttpPatch("{categoryId:long}", Name = nameof(PathCategory))]
+        public async Task<IActionResult> PathCategory([FromRoute] long categoryId, [FromBody] JsonPatchDocument<CategoryForPatch> patch)
         {
-            return (_context.Categories?.Any(e => e.CategoryId == id)).GetValueOrDefault();
+            var categoryForPatch = await _categoryService.GetCategoryForPatch(categoryId);
+
+            if (categoryForPatch == null)
+                return NotFound();
+
+            patch.ApplyTo(categoryForPatch);
+
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
+            await _categoryService.PatchCategory(categoryId, categoryForPatch);
+            return NoContent();
         }
     }
 }

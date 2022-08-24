@@ -14,9 +14,9 @@ namespace CatalogService.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
 
-        public CategoriesController(CategoryService categoryService, IMapper mapper)
+        public CategoriesController(ICategoryService categoryService, IMapper mapper)
         {
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -42,15 +42,6 @@ namespace CatalogService.Controllers
 
             return Ok(category);
         }
-        
-        
-        /*[HttpGet("{categoryId:long}/items", Name = nameof(GetCategoryItemsList))]
-        public async Task<IActionResult> GetCategoryItemsList([FromRoute] long categoryId)
-        {
-            var itemsFromDb = await _context.Items.Where(x => x.CategoryId == categoryId).ToListAsync();
-            
-            return Ok(itemsFromDb);
-        }*/
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCategory(long id, CategoryForUpdate category)

@@ -11,9 +11,9 @@ namespace CatalogService.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly ItemService _itemService;
+        private readonly IItemService _itemService;
 
-        public ItemsController(IMapper mapper, ItemService context)
+        public ItemsController(IMapper mapper, IItemService context)
         {
             _mapper = mapper;
             _itemService = context;

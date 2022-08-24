@@ -18,8 +18,6 @@ namespace CatalogService.Data
             }
 
             base.OnModelCreating(builder);
-            //builder.Entity<Category>();
-            //builder.Entity<Item>().HasOne(p => p.Category).WithMany(p => p.Items);
         }
         public DbSet<Category> Categories { get; set; } = null!;
 

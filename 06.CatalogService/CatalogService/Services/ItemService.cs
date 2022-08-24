@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CatalogService.Services
 {
-    public class ItemService
+    public class ItemService : IItemService
     {
         private readonly CategoryDbContext _context;
         private readonly IMapper _mapper;
@@ -52,6 +52,7 @@ namespace CatalogService.Services
         {
             var itemFromDb = await _context
                 .Items
+                .AsNoTracking()
                 .FirstOrDefaultAsync(item => item.ItemId == itemId);
 
             return _mapper.Map<ItemDetail>(itemFromDb);
@@ -66,7 +67,7 @@ namespace CatalogService.Services
 
             async Task<ICollection<ItemDetail>> GetItems()
             {
-                var categoriesFromDb = await PagedList<Item>.ToPagedListAsync(_context.Items, query.PageNumber, query.PageSize);
+                var categoriesFromDb = await PagedList<Item>.ToPagedListAsync(_context.Items.AsNoTracking(), query.PageNumber, query.PageSize);
 
                 var mappedItems = _mapper.Map<PagedList<ItemDetail>>(categoriesFromDb);
 

@@ -9,8 +9,8 @@ builder.Services.AddDbContext<CategoryDbContext>(opt => opt.UseSqlServer(@"Data 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<ItemService>();
+builder.Services.AddScoped<ICategoryService,CategoryService>();
+builder.Services.AddScoped<IItemService,ItemService>();
 
 var app = builder.Build();
 

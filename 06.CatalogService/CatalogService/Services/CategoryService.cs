@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CatalogService.Services
 {
-    public class CategoryService
+    public class CategoryService : ICategoryService
     {
         private readonly CategoryDbContext _context;
         private readonly IMapper _mapper;
@@ -52,19 +52,10 @@ namespace CatalogService.Services
         {
             var categoryFromDb = await _context
                 .Categories
-                .FirstOrDefaultAsync(category => category.CategoryId == categoryId);
-
-            return _mapper.Map<CategoryDetail>(categoryFromDb);
-        }
-
-        public async Task<CategoryForPatch?> GetCategoryForPatch(long categoryId)
-        {
-            var categoryFromDb = await _context
-                .Categories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(category => category.CategoryId == categoryId);
 
-            return categoryFromDb == null ? null : _mapper.Map<CategoryForPatch>(categoryFromDb);
+            return _mapper.Map<CategoryDetail>(categoryFromDb);
         }
 
         public Task<ICollection<CategoryDetail>> GetCategories(CategoryQuery query)
@@ -76,7 +67,7 @@ namespace CatalogService.Services
 
             async Task<ICollection<CategoryDetail>> GetCategories()
             {
-                var categoriesFromDb = await PagedList<Category>.ToPagedListAsync(_context.Categories, query.PageNumber, query.PageSize);
+                var categoriesFromDb = await PagedList<Category>.ToPagedListAsync(_context.Categories.AsNoTracking(), query.PageNumber, query.PageSize);
 
                 var mappedCategories = _mapper.Map<PagedList<CategoryDetail>>(categoriesFromDb);
 

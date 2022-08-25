@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using Expressions.Task3.E3SQueryProvider.Models.Entities;
+using Expressions.Task3.E3SQueryProvider.Models.Request;
 using Xunit;
 
 namespace Expressions.Task3.E3SQueryProvider.Test
@@ -24,18 +25,14 @@ namespace Expressions.Task3.E3SQueryProvider.Test
         {
             var translator = new ExpressionToFtsRequestTranslator();
             Expression<Func<IQueryable<EmployeeEntity>, IQueryable<EmployeeEntity>>> expression
-                = query => query.Where(e => e.Workstation == "EPRUIZHW006" && e.Manager.StartsWith("John"));
-            /*
-             * The expression above should be converted to the following FTSQueryRequest and then serialized inside FTSRequestGenerator:
-             * "statements": [
-                { "query":"Workstation:(EPRUIZHW006)"},
-                { "query":"Manager:(John*)"}
-                // Operator between queries is AND, in other words result set will fit to both statements above
-              ],
-             */
+                = query => query.Where(e => e.Workstation == "EPRUIZHW006" && e.Manager.StartsWith("John") && e.Status == "active");
 
-            // todo: create asserts for this test by yourself, because they will depend on your final implementation
-            throw new NotImplementedException("Please implement this test and the appropriate functionality");
+            string translatedQuery = translator.Translate(expression);
+
+            var generator = new FtsRequestGenerator("https://mysite.com");
+            var requestURL = generator.GenerateRequestUrl(typeof(EmployeeEntity), translatedQuery);
+
+            Assert.Equal("Workstation:(EPRUIZHW006) AndAlso Manager:(John*) AndAlso Status:(active)", translatedQuery);
         }
 
         #endregion

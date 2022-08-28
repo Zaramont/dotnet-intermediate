@@ -24,10 +24,10 @@ public class OrderService : IOrderService
     public void PlaceOrder(string productId, int quantity, string email)
     {
         var product = this.productCatalog.GetProductDetails(productId);
-        var totalPrice = product.price * quantity;
+        double totalPrice = product.price * quantity;
         string orderId = "333";
         
-        var paymentResult = this.paymentSystem.MakePayment(new Payment(orderId, totalPrice));
+        bool paymentResult = this.paymentSystem.MakePayment(new Payment(orderId, totalPrice));
         if (paymentResult)
         {
             this.invoiceSystem.SendInvoice(new Invoice(product.name, quantity, email, totalPrice, orderId));

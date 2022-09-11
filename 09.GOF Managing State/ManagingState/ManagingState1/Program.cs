@@ -18,9 +18,11 @@ var tradeFilter = new TradeFilter();
 var bofaTrades = tradeFilter.FilterForBank(trades, Bank.Bofa);
 var barclaysTrades = tradeFilter.FilterForBank(trades, Bank.Barclays);
 var connacordTrades = tradeFilter.FilterForBank(trades, Bank.Connacord);
+var deutscheTrades = tradeFilter.FilterForBank(trades, Bank.Deutsche);
 PrintTrades(bofaTrades);
 PrintTrades(barclaysTrades);
 PrintTrades(connacordTrades);
+PrintTrades(deutscheTrades);
 
 static void PrintTrades(IEnumerable<Trade> trades)
 {
@@ -29,13 +31,6 @@ static void PrintTrades(IEnumerable<Trade> trades)
         Console.WriteLine(item);
     }
     Console.WriteLine();
-}
-
-public interface IFilter
-
-{
-    IEnumerable<Trade> Match(IEnumerable<Trade> trades);
-
 }
 
 public class TradeFilter
@@ -47,23 +42,4 @@ public class TradeFilter
     }
 }
 
-public enum Bank
-{
-    Bofa,
-    Connacord,
-    Barclays
-}
-
 public record Trade(int Id, DealType Type, DealSubTupe SubType, int Amount);
-
-public enum DealType
-{
-    Option,
-    Future
-}
-public enum DealSubTupe
-{
-    NYOption,
-    NewOption,
-    Other
-}

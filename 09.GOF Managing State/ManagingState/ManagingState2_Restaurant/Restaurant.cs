@@ -1,17 +1,13 @@
 ﻿class Restaurant
 
 {
-    private readonly IRecipeFactory _factory;
-
-    public Restaurant(IRecipeFactory factory)
-    {
-        this._factory = factory;
-    }
-
-    public void CookMasala(ICooker cooker, Country country)
+    public void CookMasala(ICooker cooker, Country country, DateTime currentTime)
 
     {
-        var recipe = this._factory.CreateRecipe(country);
+        IRecipeFactory factory = (currentTime.Month > 5 && currentTime.Month < 9) ?
+            new SummerMasalaRecipeFactory() :
+            new MasalaRecipeFactory();
+        var recipe = factory.CreateRecipe(country);
         recipe.Cook(cooker);
     }
 

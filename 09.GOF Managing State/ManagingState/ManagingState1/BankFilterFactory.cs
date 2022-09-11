@@ -1,6 +1,6 @@
 ﻿using ManagingState1;
 
-public class BankFilterFactory
+public class BankFilterFactory: IBankFilterFactory
 {
     public IFilter CreateBankFilter(Bank bank, Country country)
     {

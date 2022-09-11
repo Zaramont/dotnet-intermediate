@@ -16,13 +16,15 @@
 
 var tradeFilter = new TradeFilter();
 var bofaTrades = tradeFilter.FilterForBank(trades, Bank.Bofa);
-var barclaysTrades = tradeFilter.FilterForBank(trades, Bank.Barclays);
+var barclaysTrades = tradeFilter.FilterForBank(trades, Bank.Barclays, Country.USA);
 var connacordTrades = tradeFilter.FilterForBank(trades, Bank.Connacord);
 var deutscheTrades = tradeFilter.FilterForBank(trades, Bank.Deutsche);
+var barclaysEnglandTrades = tradeFilter.FilterForBank(trades, Bank.Barclays, Country.England);
 PrintTrades(bofaTrades);
 PrintTrades(barclaysTrades);
 PrintTrades(connacordTrades);
 PrintTrades(deutscheTrades);
+PrintTrades(barclaysEnglandTrades);
 
 static void PrintTrades(IEnumerable<Trade> trades)
 {
@@ -35,9 +37,9 @@ static void PrintTrades(IEnumerable<Trade> trades)
 
 public class TradeFilter
 {
-    public IEnumerable<Trade> FilterForBank(IEnumerable<Trade> trades, Bank bank)
+    public IEnumerable<Trade> FilterForBank(IEnumerable<Trade> trades, Bank bank, Country country = Country.USA)
     {
-        var filter = new BankFilterFactory().CreateBankFilter(bank);
+        var filter = new BankFilterFactory().CreateBankFilter(bank, country);
         return filter.Match(trades);
     }
 }

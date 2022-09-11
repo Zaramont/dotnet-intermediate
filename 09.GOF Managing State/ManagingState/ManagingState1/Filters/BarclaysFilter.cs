@@ -1,7 +1,18 @@
 ﻿public class BarclaysFilter : IFilter
 {
-    public IEnumerable<Trade> Match(IEnumerable<Trade> trades)
+    private IFilter regionFilter;
+
+    public BarclaysFilter(Country country)
     {
-        return trades.Where(t => t.Type == DealType.Option && t.SubType == DealSubTupe.NYOption && t.Amount > 50);
+        regionFilter = country switch {
+        Country.England => new BarclaysEnglandFilter(),
+        Country.USA => new BarclaysUSAFilter(),
+        _ => throw new ArgumentException($"There is no such bank in the '{country}'"),
+        };
+    }
+
+    public virtual IEnumerable<Trade> Match(IEnumerable<Trade> trades)
+    {
+        return regionFilter.Match(trades);
     }
 }

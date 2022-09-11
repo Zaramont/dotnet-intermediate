@@ -2,12 +2,12 @@
 
 public class BankFilterFactory
 {
-    public IFilter CreateBankFilter(Bank bank)
+    public IFilter CreateBankFilter(Bank bank, Country country)
     {
         return bank switch
         {
             Bank.Bofa => new BofaFilter(),
-            Bank.Barclays => new BarclaysFilter(),
+            Bank.Barclays => new BarclaysFilter(country),
             Bank.Connacord => new ConnacordFilter(),
             Bank.Deutsche => new DeutscheFilter(),
             _ => throw new ArgumentException($"Bank '{bank}' is not supported")
